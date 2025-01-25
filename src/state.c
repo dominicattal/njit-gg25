@@ -35,8 +35,7 @@ static void process_input(f32 dt)
     if (window_key_pressed(GLFW_KEY_P))
         zoom_magnitude--;
 
-    if (vec2_mag(direction) != 0)
-        game_move(direction, dt);
+    game_move(direction, dt);
     if (zoom_magnitude != 0)
         game_zoom(zoom_magnitude, dt);
 }

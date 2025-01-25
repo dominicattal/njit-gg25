@@ -46,7 +46,7 @@ static void push_entity_into_buffer(Entity* ent)
     for (i32 i = 0; i < 4; i++) {
         ctx.vbo_buffer[ctx.vbo_length++] = ent->position.x + dx[i] * ent->size.x;
         ctx.vbo_buffer[ctx.vbo_length++] = ent->position.y + dy[i] * ent->size.y;
-        ctx.vbo_buffer[ctx.vbo_length++] = (dx[i]) ? x2 : x1;
+        ctx.vbo_buffer[ctx.vbo_length++] = (dx[i] ^ ent->facing_left) ? x2 : x1;
         ctx.vbo_buffer[ctx.vbo_length++] = (dy[i]) ? y2 : y1;
         ctx.vbo_buffer[ctx.vbo_length++] = tex;
     }
@@ -131,6 +131,7 @@ Entity* entity_create(EntityID id)
     array_push(ctx.entities, ent);
     ent->id = id;
     ent->frame = 0;
+    ent->facing_left = FALSE;
     switch (id) {
         CASE_CREATE(ENT_PUBBLES, pubbles_create)
     }
@@ -142,6 +143,12 @@ Entity* entity_create(EntityID id)
 
 void entity_update(Entity* ent, f32 dt)
 {
+    vec2 velocity = vec2_scale(vec2_normalize(ent->direction), ent->speed * dt);
+    ent->position = vec2_add(ent->position, velocity);
+    if (ent->facing_left && velocity.x > 0)
+        ent->facing_left = FALSE;
+    else if (!ent->facing_left && velocity.x < 0)
+        ent->facing_left = TRUE;
     switch (ent->id) {
         CASE_UPDATE(ENT_PUBBLES, pubbles_update)
     }

@@ -40,6 +40,8 @@ void pubbles_create(Entity* entity)
     entity->data = data;
     data->timer = 0;
     entity->position = vec2_create(0, 0);
+    entity->direction = vec2_create(0, 0);
+    entity->speed = 1;
     entity->size = vec2_create(1, 1);
 }
 

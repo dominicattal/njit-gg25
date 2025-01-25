@@ -3,13 +3,14 @@
 
 #include "../util/util.h"
 
-#define NUM_TEXTURES 3
+#define NUM_TEXTURES 5
 
 typedef enum {
     TEX_NONE = 0,
     TEX_COLOR = 1,
-    TEX_BITMAP,
     TEX_PUBBLES,
+    TEX_BUBBLES,
+    TEX_BITMAP,
 } Texture;
 
 #define NUM_FONTS   4

@@ -41,10 +41,11 @@ typedef struct {
     i32 location;
 } TEX;
 
-#define NUM_IMAGES_TO_PACK 2
+#define NUM_IMAGES_TO_PACK 3
 static Image images[NUM_IMAGES_TO_PACK] = {
     (Image) { TEX_COLOR,   "assets/textures/color.png" },
-    (Image) { TEX_PUBBLES, "assets/textures/pubbles.png" }
+    (Image) { TEX_PUBBLES, "assets/textures/pubbles.png" },
+    (Image) { TEX_BUBBLES, "assets/textures/bubbles.png" }
 };
 
 typedef struct {

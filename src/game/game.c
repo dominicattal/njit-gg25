@@ -27,6 +27,8 @@ static void* game_update(void* vargp)
         start = get_time();
         sem_wait(&game.mutex);
         entity_context_update(game.dt);
+        /* if (game.player != NULL)
+            game.center = game.player->position; */
         sem_post(&game.mutex);
         game.dt = get_time() - start;
     }
@@ -60,11 +62,9 @@ void game_destroy(void)
 
 void game_move(vec2 dir, f32 dt)
 {
-    game.center = vec2_add(game.center, vec2_scale(vec2_normalize(dir), dt));
     if (game.player != NULL)
-        game.player->position = vec2_create(game.center.x - game.player->size.x / 2, game.center.y);
-    glBindBuffer(GL_UNIFORM_BUFFER, game.view_ubo);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, 2 * sizeof(f32), &game.center);
+        game.player->direction = dir;
+    
 }
 
 void game_zoom(i32 mag, f32 dt)
@@ -78,9 +78,7 @@ void game_start(void)
 {
     sem_wait(&game.mutex);
     game.player = entity_create(ENT_PUBBLES);
-    Entity* ent1 = entity_create(ENT_PUBBLES);
-    Entity* ent = entity_create(ENT_PUBBLES);
-    ent->position = vec2_create(0.5, 0.5);
+    game.player->position = vec2_create(game.center.x - game.player->size.x / 2, game.center.y);
     sem_post(&game.mutex);
 }
 
@@ -94,6 +92,8 @@ void game_prepare_render(void)
     sem_wait(&game.mutex);
     entity_context_prepare_render();
     sem_post(&game.mutex);
+    glBindBuffer(GL_UNIFORM_BUFFER, game.view_ubo);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, 2 * sizeof(f32), &game.center);
 }
 
 void game_render(void)

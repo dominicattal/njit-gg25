@@ -12,7 +12,10 @@ typedef struct {
     u32 id;
     u32 frame;
     vec2 position;
+    vec2 direction;
+    f32 speed;
     vec2 size;
+    bool facing_left;
     void* data;
 } Entity;
 
