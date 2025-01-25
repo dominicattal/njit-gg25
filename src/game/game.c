@@ -25,6 +25,7 @@ static void* game_update(void* vargp)
     while (!game.kill_thread) {
         sem_wait(&game.mutex);
         start = get_time();
+        entity_context_update(game.dt);
         game.dt = get_time() - start;
         sem_post(&game.mutex);
     }
@@ -76,10 +77,14 @@ f64 game_dt(void)
 
 void game_prepare_render(void)
 {
+    sem_wait(&game.mutex);
     entity_context_prepare_render();
+    sem_post(&game.mutex);
 }
 
 void game_render(void)
 {    
+    sem_wait(&game.mutex);
     entity_context_render();
+    sem_post(&game.mutex);
 }

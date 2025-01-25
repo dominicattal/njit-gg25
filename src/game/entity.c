@@ -7,6 +7,7 @@
 #include <string.h>
 
 typedef struct {
+    Array* entities;
     u32 entity_vao;
     u32 entity_vbo;
     u32 entity_ebo;
@@ -34,25 +35,36 @@ static void push_entity_into_buffer(Entity* ent)
             ctx.vbo_buffer = realloc(ctx.vbo_buffer, ctx.vbo_capacity * sizeof(f32));
             ctx.ebo_buffer = realloc(ctx.ebo_buffer, ctx.ebo_capacity * sizeof(u32));
         }
-        for (i32 i = 0; i < 4; i++) {
-            ctx.vbo_buffer[ctx.vbo_length++] = dx[i];
-            ctx.vbo_buffer[ctx.vbo_length++] = dy[i];
-            ctx.vbo_buffer[ctx.vbo_length++] = pubbles_frames[0][2*dx[i]];
-            ctx.vbo_buffer[ctx.vbo_length++] = pubbles_frames[0][2*dy[i]+1];
-            ctx.vbo_buffer[ctx.vbo_length++] = TEX_PUBBLES;
-        }
-        u32 idx = 4 * ctx.ebo_length / 6;
-        for (i32 i = 0; i < 6; i++)
-            ctx.ebo_buffer[ctx.ebo_length++] = winding[i] + idx;
     }
+    for (i32 i = 0; i < 4; i++) {
+        ctx.vbo_buffer[ctx.vbo_length++] = dx[i];
+        ctx.vbo_buffer[ctx.vbo_length++] = dy[i];
+        ctx.vbo_buffer[ctx.vbo_length++] = pubbles_frames[ent->frame][2*dx[i]];
+        ctx.vbo_buffer[ctx.vbo_length++] = pubbles_frames[ent->frame][2*dy[i]+1];
+        ctx.vbo_buffer[ctx.vbo_length++] = TEX_PUBBLES;
+    }
+    u32 idx = 4 * ctx.ebo_length / 6;
+    for (i32 i = 0; i < 6; i++)
+        ctx.ebo_buffer[ctx.ebo_length++] = winding[i] + idx;
 }
 
 Entity* entity_create(EntityID id)
 {
     Entity* ent = malloc(sizeof(Entity));
+    array_push(ctx.entities, ent);
     ent->id = id;
     ent->frame = 0;
+    ent->timer = 0;
     return ent;
+}
+
+void entity_update(Entity* entity, f32 dt)
+{
+    entity->timer -= dt;
+    if (entity->timer < 0) {
+        entity->timer += 0.04;
+        entity->frame = (entity->frame + 1) % 10;
+    }
 }
 
 void entity_destroy(Entity* entity)
@@ -75,6 +87,7 @@ void entity_context_init(void)
     glEnableVertexAttribArray(2);
     glBindVertexArray(0);
 
+    ctx.entities = array_create();
     ctx.vbo_length = 0;
     ctx.ebo_length = 0;
     ctx.vbo_capacity = 0;
@@ -82,17 +95,29 @@ void entity_context_init(void)
     ctx.vbo_buffer = NULL;
     ctx.ebo_buffer = NULL;
 
-    Entity* ent = entity_create(ENT_PUBBLES);
-    push_entity_into_buffer(ent);
+    entity_create(ENT_PUBBLES);
 }
 
 void entity_context_destroy(void)
 {
+    while (!array_empty(ctx.entities))
+        entity_destroy((Entity*)array_pop(ctx.entities, 0));
+    array_destroy(ctx.entities);
     free(ctx.vbo_buffer);
     free(ctx.ebo_buffer);
     glDeleteVertexArrays(1, &ctx.entity_vao);
     glDeleteBuffers(1, &ctx.entity_vbo);
     glDeleteBuffers(1, &ctx.entity_ebo);
+}
+
+void entity_context_update(f32 dt)
+{
+    ctx.vbo_length = 0;
+    ctx.ebo_length = 0;
+    for (i32 i = 0; i < ctx.entities->length; i++) {
+        entity_update(array_get(ctx.entities, i), dt);
+        push_entity_into_buffer(array_get(ctx.entities, i));
+    }
 }
 
 void entity_context_prepare_render(void)

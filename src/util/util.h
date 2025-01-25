@@ -3,7 +3,7 @@
 
 #include "type.h"
 #include "linalg.h"
-#include "list.h"
+#include "array.h"
 #include "env.h"
 #include "random.h"
 #include "stack.h"
