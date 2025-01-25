@@ -6,6 +6,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define NUM_ENTITY_FUNCTIONS    2
+#define FUNC_GET_TEX_INFO       0
+#define FUNC_UPDATE             1
+
 typedef struct {
     Array* entities;
     u32 entity_vao;
@@ -36,40 +40,19 @@ static void push_entity_into_buffer(Entity* ent)
             ctx.ebo_buffer = realloc(ctx.ebo_buffer, ctx.ebo_capacity * sizeof(u32));
         }
     }
+    f32 x1, x2, y1, y2;
+    u32 tex;
+    entity_get_tex_info(ent, &tex, &x1, &x2, &y1, &y2);
     for (i32 i = 0; i < 4; i++) {
         ctx.vbo_buffer[ctx.vbo_length++] = dx[i];
         ctx.vbo_buffer[ctx.vbo_length++] = dy[i];
-        ctx.vbo_buffer[ctx.vbo_length++] = pubbles_frames[ent->frame][2*dx[i]];
-        ctx.vbo_buffer[ctx.vbo_length++] = pubbles_frames[ent->frame][2*dy[i]+1];
-        ctx.vbo_buffer[ctx.vbo_length++] = TEX_PUBBLES;
+        ctx.vbo_buffer[ctx.vbo_length++] = (dx[i]) ? x2 : x1;
+        ctx.vbo_buffer[ctx.vbo_length++] = (dy[i]) ? y2 : y1;
+        ctx.vbo_buffer[ctx.vbo_length++] = tex;
     }
     u32 idx = 4 * ctx.ebo_length / 6;
     for (i32 i = 0; i < 6; i++)
         ctx.ebo_buffer[ctx.ebo_length++] = winding[i] + idx;
-}
-
-Entity* entity_create(EntityID id)
-{
-    Entity* ent = malloc(sizeof(Entity));
-    array_push(ctx.entities, ent);
-    ent->id = id;
-    ent->frame = 0;
-    ent->timer = 0;
-    return ent;
-}
-
-void entity_update(Entity* entity, f32 dt)
-{
-    entity->timer -= dt;
-    if (entity->timer < 0) {
-        entity->timer += 0.04;
-        entity->frame = (entity->frame + 1) % 10;
-    }
-}
-
-void entity_destroy(Entity* entity)
-{
-    free(entity);
 }
 
 void entity_context_init(void)
@@ -136,4 +119,52 @@ void entity_context_render(void)
     glBindBuffer(GL_ARRAY_BUFFER, ctx.entity_vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx.entity_ebo);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+// ----------------------------------
+
+#define CASE_CREATE(_ent, _func) \
+    case _ent: _func(ent); break;
+
+Entity* entity_create(EntityID id)
+{
+    Entity* ent = malloc(sizeof(Entity));
+    array_push(ctx.entities, ent);
+    ent->id = id;
+    ent->frame = 0;
+    switch (id) {
+        CASE_CREATE(ENT_PUBBLES, pubbles_create)
+    }
+    return ent;
+}
+
+#define CASE_UPDATE(_ent, _func) \
+    case _ent: _func(ent, dt); break;
+
+void entity_update(Entity* ent, f32 dt)
+{
+    switch (ent->id) {
+        CASE_UPDATE(ENT_PUBBLES, pubbles_update)
+    }
+}
+
+#define CASE_GET_TEX_INFO(_ent, _func) \
+    case _ent: _func(ent, tex, x1, x2, y1, y2); break;
+
+void entity_get_tex_info(Entity* ent, u32* tex, f32* x1, f32* x2, f32* y1, f32* y2)
+{
+    switch (ent->id) {
+        CASE_GET_TEX_INFO(ENT_PUBBLES, pubbles_get_tex_info)
+    }
+}
+
+#define CASE_DESTROY(_ent, _func) \
+    case _ent: _func(ent); break;
+
+void entity_destroy(Entity* ent)
+{
+    switch (ent->id) {
+        CASE_DESTROY(ENT_PUBBLES, pubbles_destroy)
+    }
+    free(ent);
 }
