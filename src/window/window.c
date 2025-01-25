@@ -1,6 +1,7 @@
 #include "window.h"
 #include "../gui/gui.h"
 #include "../game/game.h"
+#include "../renderer/renderer.h"
 #include <glfw.h>
 #include <stdio.h>
 #include <stb_image.h>

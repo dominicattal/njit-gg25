@@ -9,14 +9,16 @@ typedef enum {
     TEX_NONE = 0,
     TEX_COLOR = 1,
     TEX_BITMAP,
+    TEX_PUBBLES,
 } Texture;
 
-#define NUM_FONTS   3
+#define NUM_FONTS   4
 
 typedef enum {
     FONT_DEFAULT = 0,
     FONT_TWO = 1,
-    FONT_MONOSPACE = 2
+    FONT_MONOSPACE = 2,
+    FONT_BUBBLE = 3
 } Font;
 
 void texture_init(void);

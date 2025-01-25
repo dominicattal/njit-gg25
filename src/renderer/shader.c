@@ -110,7 +110,7 @@ void shader_init(void)
     detach(SHADER_GAME, frag);
     delete(vert);
     delete(frag);
-    //shader_bind_uniform_block(SHADER_GAME, UBO_VIEW, "View");
+    shader_bind_uniform_block(SHADER_GAME, UBO_VIEW, "View");
 }
 
 void shader_use(Shader id)

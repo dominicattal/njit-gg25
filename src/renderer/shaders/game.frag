@@ -17,6 +17,13 @@ layout (std430, binding = 1) readonly buffer Textures
     Tex texs[];
 };
 
+in vec2 UV;
+in flat int ID;
+
 void main() {
-    FragColor = vec4(1.0, 0.0, 1.0, 1.0);
+    vec2 TexCoord;
+    Tex tex = texs[ID];
+    TexCoord.x = tex.u + UV.x * tex.w;
+    TexCoord.y = tex.v + UV.y * tex.h;
+    FragColor = texture(textures[tex.location], TexCoord);
 }

@@ -41,9 +41,10 @@ typedef struct {
     i32 location;
 } TEX;
 
-#define NUM_IMAGES_TO_PACK 1
+#define NUM_IMAGES_TO_PACK 2
 static Image images[NUM_IMAGES_TO_PACK] = {
-    (Image) { TEX_COLOR, "assets/textures/color.png" },
+    (Image) { TEX_COLOR,   "assets/textures/color.png" },
+    (Image) { TEX_PUBBLES, "assets/textures/pubbles.png" }
 };
 
 typedef struct {
@@ -161,6 +162,7 @@ static void create_font_textures(i32* tex_unit_location, TEX* textures)
     load_font(&spc, FONT_DEFAULT, 16, "assets/fonts/mojangles.ttf");
     load_font(&spc, FONT_TWO, 16, "assets/fonts/times.ttf");
     load_font(&spc, FONT_MONOSPACE, 16, "assets/fonts/consola.ttf");
+    load_font(&spc, FONT_BUBBLE, 24, "assets/fonts/wires.ttf");
 
     stbtt_PackEnd(&spc);
 
