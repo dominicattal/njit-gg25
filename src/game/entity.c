@@ -4,10 +4,7 @@
 #include "entities/entities.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-typedef struct {
-    u32 id;
-} Entity;
+#include <string.h>
 
 typedef struct {
     u32 entity_vao;
@@ -15,11 +12,55 @@ typedef struct {
     u32 entity_ebo;
     f32* vbo_buffer;
     u32* ebo_buffer;
+    u32 vbo_length, ebo_length;
+    u32 vbo_capacity, ebo_capacity;
 } EntityContext;
 
 static EntityContext ctx;
 
-void entity_init(void)
+#define NEW_ENTS_PER_RESIZE 5
+static void push_entity_into_buffer(Entity* ent)
+{
+    static i32 dx[] = {0, 0, 1, 1};
+    static i32 dy[] = {0, 1, 1, 0};
+    static u32 winding[] = { 0, 1, 2, 0, 2, 3 };
+    if (ctx.vbo_capacity < ctx.vbo_length + 20) {
+        ctx.vbo_capacity = NEW_ENTS_PER_RESIZE * 20;
+        ctx.ebo_capacity = NEW_ENTS_PER_RESIZE * 6;
+        if (ctx.vbo_buffer == NULL) {
+            ctx.vbo_buffer = malloc(ctx.vbo_capacity * sizeof(f32));
+            ctx.ebo_buffer = malloc(ctx.ebo_capacity * sizeof(u32));
+        } else {
+            ctx.vbo_buffer = realloc(ctx.vbo_buffer, ctx.vbo_capacity * sizeof(f32));
+            ctx.ebo_buffer = realloc(ctx.ebo_buffer, ctx.ebo_capacity * sizeof(u32));
+        }
+        for (i32 i = 0; i < 4; i++) {
+            ctx.vbo_buffer[ctx.vbo_length++] = dx[i];
+            ctx.vbo_buffer[ctx.vbo_length++] = dy[i];
+            ctx.vbo_buffer[ctx.vbo_length++] = pubbles_frames[0][2*dx[i]];
+            ctx.vbo_buffer[ctx.vbo_length++] = pubbles_frames[0][2*dy[i]+1];
+            ctx.vbo_buffer[ctx.vbo_length++] = TEX_PUBBLES;
+        }
+        u32 idx = 4 * ctx.ebo_length / 6;
+        for (i32 i = 0; i < 6; i++)
+            ctx.ebo_buffer[ctx.ebo_length++] = winding[i] + idx;
+    }
+}
+
+Entity* entity_create(EntityID id)
+{
+    Entity* ent = malloc(sizeof(Entity));
+    ent->id = id;
+    ent->frame = 0;
+    return ent;
+}
+
+void entity_destroy(Entity* entity)
+{
+    free(entity);
+}
+
+void entity_context_init(void)
 {
     glGenVertexArrays(1, &ctx.entity_vao);
     glGenBuffers(1, &ctx.entity_vbo);
@@ -34,23 +75,18 @@ void entity_init(void)
     glEnableVertexAttribArray(2);
     glBindVertexArray(0);
 
-    ctx.vbo_buffer = malloc(8 * sizeof(f32));
-    ctx.ebo_buffer = malloc(6 * sizeof(u32));
-    f32 data_vbo[] = {
-        0.0f, 0.0f, pubbles_frames[0].x1, pubbles_frames[0].y2, TEX_PUBBLES,
-        0.0f, 1.0f, pubbles_frames[0].x1, pubbles_frames[0].y1, TEX_PUBBLES,
-        1.0f, 1.0f, pubbles_frames[0].x2, pubbles_frames[0].y1, TEX_PUBBLES,
-        1.0f, 0.0f, pubbles_frames[0].x2, pubbles_frames[0].y2, TEX_PUBBLES
-    };
-    u32 data_ebo[] = { 0, 1, 2, 0, 2, 3 };
+    ctx.vbo_length = 0;
+    ctx.ebo_length = 0;
+    ctx.vbo_capacity = 0;
+    ctx.ebo_capacity = 0;
+    ctx.vbo_buffer = NULL;
+    ctx.ebo_buffer = NULL;
 
-    glBindBuffer(GL_ARRAY_BUFFER, ctx.entity_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(data_vbo), data_vbo, GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx.entity_ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(data_ebo), data_ebo, GL_STATIC_DRAW);
+    Entity* ent = entity_create(ENT_PUBBLES);
+    push_entity_into_buffer(ent);
 }
 
-void entity_destroy(void)
+void entity_context_destroy(void)
 {
     free(ctx.vbo_buffer);
     free(ctx.ebo_buffer);
@@ -59,12 +95,15 @@ void entity_destroy(void)
     glDeleteBuffers(1, &ctx.entity_ebo);
 }
 
-void entity_prepare_render(void)
+void entity_context_prepare_render(void)
 {
-
+    glBindBuffer(GL_ARRAY_BUFFER, ctx.entity_vbo);
+    glBufferData(GL_ARRAY_BUFFER, ctx.vbo_length * sizeof(f32), ctx.vbo_buffer, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx.entity_ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ctx.ebo_length * sizeof(u32), ctx.ebo_buffer, GL_STATIC_DRAW);
 }
 
-void entity_render(void)
+void entity_context_render(void)
 {
     shader_use(SHADER_GAME);
 

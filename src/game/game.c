@@ -40,7 +40,7 @@ void game_init(void)
     glBufferData(GL_UNIFORM_BUFFER, 4 * sizeof(f32), ubo, GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_UNIFORM_BUFFER, UBO_VIEW, game.view_ubo);
 
-    entity_init();
+    entity_context_init();
     game.center = vec2_create(0, 0);
     game.kill_thread = FALSE;
     sem_init(&game.mutex, 0, 1);
@@ -76,10 +76,10 @@ f64 game_dt(void)
 
 void game_prepare_render(void)
 {
-    entity_prepare_render();
+    entity_context_prepare_render();
 }
 
 void game_render(void)
 {    
-    entity_render();
+    entity_context_render();
 }

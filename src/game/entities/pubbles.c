@@ -3,11 +3,9 @@
 #define WIDTH  96.0f
 #define HEIGHT 128.0f
 #define create_rect(x, y, w, h) \
-    {(f32)x/WIDTH, (f32)y/HEIGHT, (f32)(x+w)/WIDTH, (f32)(y+h)/HEIGHT}
+    {(f32)x/WIDTH, (f32)(y+h)/HEIGHT, (f32)(x+w)/WIDTH, (f32)y/HEIGHT}
 
-static struct {
-    f32 x1, y1, x2, y2;
-} pubbles_frames[10] = {
+static f32 pubbles_frames[10][4] = {
     create_rect(0, 0, 32, 32),
     create_rect(32, 0, 32, 32),
     create_rect(64, 0, 32, 32),
