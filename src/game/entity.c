@@ -117,7 +117,7 @@ void entity_context_render(void)
     glBindVertexArray(ctx.entity_vao);
     glBindBuffer(GL_ARRAY_BUFFER, ctx.entity_vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx.entity_ebo);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, ctx.ebo_length, GL_UNSIGNED_INT, 0);
 }
 
 // ----------------------------------

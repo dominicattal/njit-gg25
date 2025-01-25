@@ -77,11 +77,10 @@ void game_zoom(i32 mag, f32 dt)
 void game_start(void)
 {
     sem_wait(&game.mutex);
-    //game.player = entity_create(ENT_PUBBLES);
+    game.player = entity_create(ENT_PUBBLES);
     Entity* ent1 = entity_create(ENT_PUBBLES);
     Entity* ent = entity_create(ENT_PUBBLES);
-    ent->position = vec2_create(0.5, 0);
-    printf("%p, %p\n", ent1, ent);
+    ent->position = vec2_create(0.5, 0.5);
     sem_post(&game.mutex);
 }
 
