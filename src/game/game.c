@@ -8,6 +8,7 @@
 #include <semaphore.h>
 
 typedef struct {
+    Entity* player;
     u32 view_ubo;
     vec2 center;
     f32 zoom;
@@ -23,17 +24,18 @@ static void* game_update(void* vargp)
 {
     f64 start;
     while (!game.kill_thread) {
-        sem_wait(&game.mutex);
         start = get_time();
+        sem_wait(&game.mutex);
         entity_context_update(game.dt);
-        game.dt = get_time() - start;
         sem_post(&game.mutex);
+        game.dt = get_time() - start;
     }
 }
 
 void game_init(void)
 {
-    game.zoom = 1;
+    game.player = NULL;
+    game.zoom = 0.3;
     game.dt = 0;
     glGenBuffers(1, &game.view_ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, game.view_ubo);
@@ -59,6 +61,8 @@ void game_destroy(void)
 void game_move(vec2 dir, f32 dt)
 {
     game.center = vec2_add(game.center, vec2_scale(vec2_normalize(dir), dt));
+    if (game.player != NULL)
+        game.player->position = vec2_create(game.center.x - game.player->size.x / 2, game.center.y);
     glBindBuffer(GL_UNIFORM_BUFFER, game.view_ubo);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, 2 * sizeof(f32), &game.center);
 }
@@ -68,6 +72,17 @@ void game_zoom(i32 mag, f32 dt)
     game.zoom += mag * dt;
     glBindBuffer(GL_UNIFORM_BUFFER, game.view_ubo);
     glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(f32), sizeof(f32), &game.zoom);
+}
+
+void game_start(void)
+{
+    sem_wait(&game.mutex);
+    //game.player = entity_create(ENT_PUBBLES);
+    Entity* ent1 = entity_create(ENT_PUBBLES);
+    Entity* ent = entity_create(ENT_PUBBLES);
+    ent->position = vec2_create(0.5, 0);
+    printf("%p, %p\n", ent1, ent);
+    sem_post(&game.mutex);
 }
 
 f64 game_dt(void)

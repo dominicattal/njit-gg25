@@ -1,12 +1,13 @@
 #include "gui.h"
 #include "component.h"
-#include "loader.h"
+#include "presets/presets.h"
 #include "../renderer/renderer.h"
 #include "../window/window.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <semaphore.h>
 
 typedef struct {
     u32 comp_vbo_length, comp_vbo_max_length;
@@ -26,9 +27,15 @@ typedef struct {
     Component* root;
     GUIData data;
     bool initialized;
+    bool load_flag;
+    GUIPreset current_preset;
 } GUI;
 
 static GUI gui;
+
+static void (*preset_functions[NUM_PRESETS])();
+
+static void gui_loader_init(void);
 
 void gui_init(void)
 {
@@ -40,7 +47,7 @@ void gui_init(void)
     gui.root = comp_create(0, 0, xres, yres, COMP_DEFAULT);
     comp_set_color(gui.root, 0, 0, 0, 0);
     comp_set_hoverable(gui.root, FALSE);
-    gui_load(GUI_DEFAULT, gui.root);
+    gui_load(GUI_DEFAULT);
     gui.initialized = TRUE;
 
     glGenVertexArrays(1, &gui.data.comp_vao);
@@ -85,6 +92,11 @@ static void update_components_helper(Component* comp, f64 dt)
 
 void gui_update(f64 dt)
 {
+    if (gui.load_flag) {
+        comp_destroy_children(gui.root);
+        preset_functions[gui.current_preset](gui.root);
+        gui.load_flag = FALSE;
+    }
     update_components_helper(gui.root, dt);
 }
 
@@ -92,7 +104,7 @@ void gui_destroy(void)
 {
     if (!gui.initialized)
         return;
-        
+    
     comp_destroy(gui.root);
     free(gui.data.comp_vbo_buffer);
     free(gui.data.comp_ebo_buffer);
@@ -150,6 +162,20 @@ static void gui_cursor_callback_helper(Component* comp)
 void gui_cursor_callback(void) 
 {
     gui_cursor_callback_helper(gui.root);
+}
+
+/* ------------------------------ */
+
+static void gui_loader_init(void)
+{
+    preset_functions[GUI_DEFAULT] = gui_preset_default;
+    preset_functions[GUI_GAME] = gui_preset_game;
+}
+
+void gui_load(GUIPreset preset)
+{
+    gui.current_preset = preset;
+    gui.load_flag = TRUE;
 }
 
 /* ------------------------------ */
@@ -343,7 +369,7 @@ static void update_data_text(Component* comp)
         return;
 
     oy -= ascent - descent + line_gap;
-    window_pixel_to_screen_y(va * (ch - oy), &dy);
+    window_pixel_to_screen_y(va * (ch - oy) / 2, &dy);
 
     while (vbo_idx < gui.data.font_vbo_length) {
         gui.data.font_vbo_buffer[vbo_idx + 1] -= dy;

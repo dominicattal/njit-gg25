@@ -6,8 +6,10 @@
 #include <stdio.h>
 #include <stb_image.h>
 
-#define DEFAULT_WINDOW_WIDTH  1000
-#define DEFAULT_WINDOW_HEIGHT 750
+#define DEFAULT_WINDOW_WIDTH  1920/2
+#define DEFAULT_WINDOW_HEIGHT 1080/2
+#define DEFAULT_RESOLUTION_X  1920
+#define DEFAULT_RESOLUTION_Y  1080
 
 typedef struct {
     GLFWwindow* handle;
@@ -40,12 +42,12 @@ void window_init(void)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     window.handle = glfwCreateWindow(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, "program", NULL, NULL);
-    window.resolution.x = DEFAULT_WINDOW_WIDTH;
-    window.resolution.y = DEFAULT_WINDOW_HEIGHT;
+    window.resolution.x = DEFAULT_RESOLUTION_X;
+    window.resolution.y = DEFAULT_RESOLUTION_Y;
     glfwGetWindowSize(window.handle, &window.width, &window.height);
     glfwGetWindowPos(window.handle, &window.xpos, &window.ypos);
     glfwGetCursorPos(window.handle, &window.cursor.x, &window.cursor.y);
-    glfwSetWindowAspectRatio(window.handle, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
+    glfwSetWindowAspectRatio(window.handle, window.resolution.x, window.resolution.y);
     
     glfwMakeContextCurrent(window.handle);
     glfwSetFramebufferSizeCallback(window.handle, framebuffer_size_callback);

@@ -5,13 +5,14 @@
 #include <string.h>
 #include <stdio.h>
 
-#define NUM_COMPONENT_FUNCS 5
+#define NUM_COMPONENT_FUNCS 6
 
 #define COMP_FUNC_INIT      0
 #define COMP_FUNC_HOVER     1
 #define COMP_FUNC_CLICK     2
 #define COMP_FUNC_KEY       3
 #define COMP_FUNC_UPDATE    4
+#define COMP_FUNC_DESTROY   5
 
 static void (*component_functions[NUM_COMPONENTS][NUM_COMPONENT_FUNCS])();
 
@@ -70,6 +71,7 @@ void comp_detach(Component* parent, Component* child)
 
 void comp_destroy(Component* comp)
 {
+    component_functions[comp_id(comp)][COMP_FUNC_HOVER](comp);
     for (int i = 0; i < comp_num_children(comp); i++)
         comp_destroy(comp->children[i]);
     free(comp->children);
@@ -81,6 +83,7 @@ void comp_destroy_children(Component* comp) {
     for (int i = 0; i < comp_num_children(comp); i++)
         comp_destroy(comp->children[i]);
     free(comp->children);
+    comp_set_num_children(comp, 0);
     comp->children = NULL;
 }
 
@@ -177,23 +180,28 @@ static void initialize_functions(void)
         for (i32 j = 0; j < NUM_COMPONENT_FUNCS; j++)
             component_functions[i][j] = do_nothing;
     
-    component_functions[COMP_DEFAULT][COMP_FUNC_INIT]   = comp_default_init;
-    component_functions[COMP_TEXTBOX][COMP_FUNC_INIT]   = comp_textbox_init;
-    component_functions[COMP_TEXTBOX][COMP_FUNC_HOVER]  = comp_textbox_hover;
-    component_functions[COMP_TEXTBOX][COMP_FUNC_CLICK]  = comp_textbox_click;
-    component_functions[COMP_TEXTBOX][COMP_FUNC_KEY]    = comp_textbox_key;
-    component_functions[COMP_TEXTBOX][COMP_FUNC_UPDATE] = comp_textbox_update;
-    component_functions[COMP_DEBUG][COMP_FUNC_INIT]     = comp_debug_init;
-    component_functions[COMP_DEBUG][COMP_FUNC_KEY]      = comp_debug_key;
-    component_functions[COMP_DEBUG][COMP_FUNC_UPDATE]   = comp_debug_update;
+    component_functions[COMP_DEFAULT][COMP_FUNC_INIT]       = comp_default_init;
+    component_functions[COMP_TEXTBOX][COMP_FUNC_INIT]       = comp_textbox_init;
+    component_functions[COMP_TEXTBOX][COMP_FUNC_HOVER]      = comp_textbox_hover;
+    component_functions[COMP_TEXTBOX][COMP_FUNC_CLICK]      = comp_textbox_click;
+    component_functions[COMP_TEXTBOX][COMP_FUNC_KEY]        = comp_textbox_key;
+    component_functions[COMP_TEXTBOX][COMP_FUNC_UPDATE]     = comp_textbox_update;
+    component_functions[COMP_TEXTBOX][COMP_FUNC_DESTROY]    = comp_textbox_destroy;
+    component_functions[COMP_DEBUG][COMP_FUNC_INIT]         = comp_debug_init;
+    component_functions[COMP_DEBUG][COMP_FUNC_KEY]          = comp_debug_key;
+    component_functions[COMP_DEBUG][COMP_FUNC_UPDATE]       = comp_debug_update;
+    component_functions[COMP_BUTTON][COMP_FUNC_INIT]        = comp_button_init;
+    component_functions[COMP_BUTTON][COMP_FUNC_HOVER]       = comp_button_hover;
+    component_functions[COMP_BUTTON][COMP_FUNC_CLICK]       = comp_button_click;
+    component_functions[COMP_BUTTON][COMP_FUNC_DESTROY]     = comp_button_destroy;
 }
 
 // ---------------------------------------------------------------------------
 // info1            | info2 (same)   | info2 (text)      | info2 (ele)
-//  7 - id          | 24 - w, h      | 2 - halign        | 8 - num_children
-//  1 - is_text     | 16 - tex       | 2 - valign        | 1 - update_children
-// 32 - r, g, b, a  |  1 - hoverable | 6 - font_size     |
-// 24 - x, y        |  1 - hovered   | 4 - font          |
+//  7 - id          | 24 - w, h      | 2  - halign       | 8 - num_children
+//  1 - is_text     | 16 - tex       | 2  - valign       | 1 - update_children
+// 32 - r, g, b, a  |  1 - hoverable | 10 - font_size    |
+// 24 - x, y        |  1 - hovered   | 4  - font         |
 //                  |  1 - clickable |                   |
 //                  |  1 - visible   |                   |
 // ---------------------------------------------------------------------------
@@ -238,8 +246,8 @@ static void initialize_functions(void)
 #define VA_SHIFT    46
 #define VA_BITS     2
 #define FS_SHIFT    48
-#define FS_BITS     6
-#define FT_SHIFT    54
+#define FS_BITS     10
+#define FT_SHIFT    58
 #define FT_BITS     4
 
 #define SMASK(BITS)         ((1<<BITS)-1)

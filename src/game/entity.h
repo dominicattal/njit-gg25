@@ -11,6 +11,8 @@ typedef enum {
 typedef struct {
     u32 id;
     u32 frame;
+    vec2 position;
+    vec2 size;
     void* data;
 } Entity;
 

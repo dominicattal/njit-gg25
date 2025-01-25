@@ -30,8 +30,8 @@ static void push_entity_into_buffer(Entity* ent)
     static i32 dy[] = {0, 1, 1, 0};
     static u32 winding[] = { 0, 1, 2, 0, 2, 3 };
     if (ctx.vbo_capacity < ctx.vbo_length + 20) {
-        ctx.vbo_capacity = NEW_ENTS_PER_RESIZE * 20;
-        ctx.ebo_capacity = NEW_ENTS_PER_RESIZE * 6;
+        ctx.vbo_capacity += NEW_ENTS_PER_RESIZE * 20;
+        ctx.ebo_capacity += NEW_ENTS_PER_RESIZE * 6;
         if (ctx.vbo_buffer == NULL) {
             ctx.vbo_buffer = malloc(ctx.vbo_capacity * sizeof(f32));
             ctx.ebo_buffer = malloc(ctx.ebo_capacity * sizeof(u32));
@@ -44,8 +44,8 @@ static void push_entity_into_buffer(Entity* ent)
     u32 tex;
     entity_get_tex_info(ent, &tex, &x1, &x2, &y1, &y2);
     for (i32 i = 0; i < 4; i++) {
-        ctx.vbo_buffer[ctx.vbo_length++] = dx[i];
-        ctx.vbo_buffer[ctx.vbo_length++] = dy[i];
+        ctx.vbo_buffer[ctx.vbo_length++] = ent->position.x + dx[i] * ent->size.x;
+        ctx.vbo_buffer[ctx.vbo_length++] = ent->position.y + dy[i] * ent->size.y;
         ctx.vbo_buffer[ctx.vbo_length++] = (dx[i]) ? x2 : x1;
         ctx.vbo_buffer[ctx.vbo_length++] = (dy[i]) ? y2 : y1;
         ctx.vbo_buffer[ctx.vbo_length++] = tex;
@@ -77,8 +77,6 @@ void entity_context_init(void)
     ctx.ebo_capacity = 0;
     ctx.vbo_buffer = NULL;
     ctx.ebo_buffer = NULL;
-
-    entity_create(ENT_PUBBLES);
 }
 
 void entity_context_destroy(void)
@@ -98,8 +96,9 @@ void entity_context_update(f32 dt)
     ctx.vbo_length = 0;
     ctx.ebo_length = 0;
     for (i32 i = 0; i < ctx.entities->length; i++) {
-        entity_update(array_get(ctx.entities, i), dt);
-        push_entity_into_buffer(array_get(ctx.entities, i));
+        Entity* ent = array_get(ctx.entities, i);
+        entity_update(ent, dt);
+        push_entity_into_buffer(ent);
     }
 }
 

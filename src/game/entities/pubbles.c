@@ -1,6 +1,7 @@
 #include "../../util/util.h"
 #include "../../renderer/texture.h"
 #include "../entity.h"
+#include <stdlib.h>
 
 #define WIDTH  96.0f
 #define HEIGHT 128.0f
@@ -38,6 +39,8 @@ void pubbles_create(Entity* entity)
     Data* data = malloc(sizeof(Data));
     entity->data = data;
     data->timer = 0;
+    entity->position = vec2_create(0, 0);
+    entity->size = vec2_create(1, 1);
 }
 
 void pubbles_update(Entity* entity, f32 dt)

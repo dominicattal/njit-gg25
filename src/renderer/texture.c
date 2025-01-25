@@ -162,14 +162,15 @@ static void create_font_textures(i32* tex_unit_location, TEX* textures)
     load_font(&spc, FONT_DEFAULT, 16, "assets/fonts/mojangles.ttf");
     load_font(&spc, FONT_TWO, 16, "assets/fonts/times.ttf");
     load_font(&spc, FONT_MONOSPACE, 16, "assets/fonts/consola.ttf");
-    load_font(&spc, FONT_BUBBLE, 24, "assets/fonts/wires.ttf");
+    load_font(&spc, FONT_BUBBLE, 16, "assets/fonts/bst.ttf");
 
     stbtt_PackEnd(&spc);
 
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, BITMAP_WIDTH, BITMAP_HEIGHT, 0, GL_RED, GL_UNSIGNED_BYTE, bitmap);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     i32 swizzle_mask[] = {GL_ZERO, GL_ZERO, GL_ZERO, GL_RED};
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle_mask);
 
