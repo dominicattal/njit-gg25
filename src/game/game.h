@@ -7,6 +7,9 @@ void game_init(void);
 void game_destroy(void);
 f64  game_dt(void);
 
+void game_move(vec2 dir, f32 dt);
+void game_zoom(i32 mag, f32 dt);
+
 void game_prepare_render(void);
 void game_render(void);
 

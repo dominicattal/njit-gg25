@@ -26,6 +26,11 @@ vec2 vec2_normalize(vec2 vec)
 
 }
 
+vec2 vec2_scale(vec2 vec, f32 scale)
+{
+    return (vec2) { vec.x * scale, vec.y * scale };
+}
+
 vec2 vec2_direction(f32 rad)
 {
     return (vec2) { cos(rad), sin(rad) };
@@ -52,6 +57,11 @@ f32 vec2_mag(vec2 vec)
 f32 vec2_dot(vec2 v1, vec2 v2)
 {
     return v1.x * v2.x + v1.y * v2.y;
+}
+
+void vec2_print(vec2 vec)
+{
+    printf("%.5f, %.5f\n", vec.x, vec.y);
 }
 
 vec3 vec3_create(f32 x, f32 y, f32 z)

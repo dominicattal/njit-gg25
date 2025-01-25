@@ -21,8 +21,8 @@ void renderer_init(void)
     glDebugMessageCallback(message_callback, 0);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
 
     shader_init();
     texture_init();
@@ -35,12 +35,10 @@ void renderer_render(void)
     game_prepare_render();
     gui_prepare_render();
 
-    glClearColor(0.2f, 0.8f, 1.0f, 1.0f);
+    glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    glEnable(GL_DEPTH_TEST);
     game_render();
-    glDisable(GL_DEPTH_TEST);
     gui_render();
 
     renderer.dt = get_time() - start;

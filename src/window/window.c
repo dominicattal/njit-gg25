@@ -1,11 +1,12 @@
 #include "window.h"
 #include "../gui/gui.h"
+#include "../game/game.h"
 #include <glfw.h>
 #include <stdio.h>
 #include <stb_image.h>
 
-#define DEFAULT_WINDOW_WIDTH  1920 / 2
-#define DEFAULT_WINDOW_HEIGHT 1080 / 2
+#define DEFAULT_WINDOW_WIDTH  1000
+#define DEFAULT_WINDOW_HEIGHT 750
 
 typedef struct {
     GLFWwindow* handle;

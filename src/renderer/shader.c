@@ -110,7 +110,7 @@ void shader_init(void)
     detach(SHADER_GAME, frag);
     delete(vert);
     delete(frag);
-    shader_bind_uniform_block(SHADER_GAME, UBO_MATRICES, "Matrices");
+    //shader_bind_uniform_block(SHADER_GAME, UBO_VIEW, "View");
 }
 
 void shader_use(Shader id)
@@ -132,10 +132,4 @@ u32 shader_get_uniform_location(Shader shader, const char* identifier)
 void shader_bind_uniform_block(Shader shader, u32 index, const char* identifier)
 {
     glUniformBlockBinding(shaders[shader], glGetUniformBlockIndex(shaders[shader], identifier), index);
-}
-
-void shader_uniform_matrix_4fv(Shader shader, const char* identifier, i32 count, const f32* value)
-{
-    shader_use(shader);
-    glUniformMatrix4fv(glGetUniformLocation(shaders[shader], identifier), count, GL_FALSE, value);
 }

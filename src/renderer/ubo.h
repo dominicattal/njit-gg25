@@ -4,7 +4,7 @@
 #define NUM_UBOS 0
 
 typedef enum {
-    UBO_MATRICES = 1
+    UBO_VIEW = 1
 } UBO;
 
 #endif

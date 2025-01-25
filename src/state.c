@@ -19,7 +19,26 @@ void state_init(void)
 
 static void process_input(f32 dt)
 {
-    
+    i32 zoom_magnitude = 0;
+    vec2 direction = vec2_create(0, 0);
+
+    if (window_key_pressed(GLFW_KEY_W))
+        direction.y++;
+    if (window_key_pressed(GLFW_KEY_S))
+        direction.y--;
+    if (window_key_pressed(GLFW_KEY_A))
+        direction.x--;
+    if (window_key_pressed(GLFW_KEY_D))
+        direction.x++;
+    if (window_key_pressed(GLFW_KEY_O))
+        zoom_magnitude++;
+    if (window_key_pressed(GLFW_KEY_P))
+        zoom_magnitude--;
+
+    if (vec2_mag(direction) != 0)
+        game_move(direction, dt);
+    if (zoom_magnitude != 0)
+        game_zoom(zoom_magnitude, dt);
 }
 
 void state_loop(void)
