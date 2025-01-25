@@ -17,13 +17,14 @@
 #define HOVER_ON        0
 #define HOVER_OFF       1
 
-#define NUM_COMPONENTS  4
+#define NUM_COMPONENTS  5
 
 typedef enum CompID {
     COMP_DEFAULT = 0,
     COMP_TEXTBOX = 1,
     COMP_DEBUG = 2,
-    COMP_BUTTON = 3
+    COMP_BUTTON = 3,
+    COMP_SLIDESHOW = 4
 } CompID;
 
 typedef struct Component Component;

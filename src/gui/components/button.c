@@ -37,7 +37,7 @@ void comp_button_init(Component* comp)
 void comp_button_click(Component* comp, i32 button, i32 action)
 {
     Data* data = comp->data;
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && data->func_ptr != NULL)
         data->func_ptr();
 }
 

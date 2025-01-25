@@ -172,6 +172,8 @@ void comp_update(Component* comp, f64 dt)
 
 /* --------------------------------- */
 
+#define void_func_ptr void (*)()
+
 static void do_nothing() {}
 
 static void initialize_functions(void)
@@ -180,20 +182,22 @@ static void initialize_functions(void)
         for (i32 j = 0; j < NUM_COMPONENT_FUNCS; j++)
             component_functions[i][j] = do_nothing;
     
-    component_functions[COMP_DEFAULT][COMP_FUNC_INIT]       = comp_default_init;
-    component_functions[COMP_TEXTBOX][COMP_FUNC_INIT]       = comp_textbox_init;
-    component_functions[COMP_TEXTBOX][COMP_FUNC_HOVER]      = comp_textbox_hover;
-    component_functions[COMP_TEXTBOX][COMP_FUNC_CLICK]      = comp_textbox_click;
-    component_functions[COMP_TEXTBOX][COMP_FUNC_KEY]        = comp_textbox_key;
-    component_functions[COMP_TEXTBOX][COMP_FUNC_UPDATE]     = comp_textbox_update;
-    component_functions[COMP_TEXTBOX][COMP_FUNC_DESTROY]    = comp_textbox_destroy;
-    component_functions[COMP_DEBUG][COMP_FUNC_INIT]         = comp_debug_init;
-    component_functions[COMP_DEBUG][COMP_FUNC_KEY]          = comp_debug_key;
-    component_functions[COMP_DEBUG][COMP_FUNC_UPDATE]       = comp_debug_update;
-    component_functions[COMP_BUTTON][COMP_FUNC_INIT]        = comp_button_init;
-    component_functions[COMP_BUTTON][COMP_FUNC_HOVER]       = comp_button_hover;
-    component_functions[COMP_BUTTON][COMP_FUNC_CLICK]       = comp_button_click;
-    component_functions[COMP_BUTTON][COMP_FUNC_DESTROY]     = comp_button_destroy;
+    component_functions[COMP_DEFAULT][COMP_FUNC_INIT]       = (void_func_ptr)comp_default_init;
+    component_functions[COMP_TEXTBOX][COMP_FUNC_INIT]       = (void_func_ptr)comp_textbox_init;
+    component_functions[COMP_TEXTBOX][COMP_FUNC_HOVER]      = (void_func_ptr)comp_textbox_hover;
+    component_functions[COMP_TEXTBOX][COMP_FUNC_CLICK]      = (void_func_ptr)comp_textbox_click;
+    component_functions[COMP_TEXTBOX][COMP_FUNC_KEY]        = (void_func_ptr)comp_textbox_key;
+    component_functions[COMP_TEXTBOX][COMP_FUNC_UPDATE]     = (void_func_ptr)comp_textbox_update;
+    component_functions[COMP_TEXTBOX][COMP_FUNC_DESTROY]    = (void_func_ptr)comp_textbox_destroy;
+    component_functions[COMP_DEBUG][COMP_FUNC_INIT]         = (void_func_ptr)comp_debug_init;
+    component_functions[COMP_DEBUG][COMP_FUNC_KEY]          = (void_func_ptr)comp_debug_key;
+    component_functions[COMP_DEBUG][COMP_FUNC_UPDATE]       = (void_func_ptr)comp_debug_update;
+    component_functions[COMP_BUTTON][COMP_FUNC_INIT]        = (void_func_ptr)comp_button_init;
+    component_functions[COMP_BUTTON][COMP_FUNC_HOVER]       = (void_func_ptr)comp_button_hover;
+    component_functions[COMP_BUTTON][COMP_FUNC_CLICK]       = (void_func_ptr)comp_button_click;
+    component_functions[COMP_BUTTON][COMP_FUNC_DESTROY]     = (void_func_ptr)comp_button_destroy;
+    component_functions[COMP_SLIDESHOW][COMP_FUNC_INIT]     = (void_func_ptr)comp_slideshow_init;
+    component_functions[COMP_SLIDESHOW][COMP_FUNC_DESTROY]  = (void_func_ptr)comp_slideshow_destroy;
 }
 
 // ---------------------------------------------------------------------------

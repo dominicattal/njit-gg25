@@ -55,13 +55,6 @@ f64 renderer_dt(void)
     return renderer.dt;
 }
 
-void renderer_toggle_line_mode(void)
-{
-    static int mode;
-    mode = 1 - mode;
-    glPolygonMode(GL_FRONT_AND_BACK, mode ? GL_LINE : GL_FILL);
-}
-
 void GLAPIENTRY message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
     if (severity == GL_DEBUG_SEVERITY_NOTIFICATION && !ENV_SHOW_GL_NOTIFICATIONS)

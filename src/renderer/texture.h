@@ -10,6 +10,11 @@ typedef enum {
     TEX_COLOR = 1,
     TEX_PUBBLES,
     TEX_BUBBLES,
+    TEX_CUTSCENE_1,
+    TEX_CUTSCENE_2,
+    TEX_CUTSCENE_3,
+    TEX_CUTSCENE_4,
+    TEX_CUTSCENE_5,
     TEX_BITMAP,
 } Texture;
 
