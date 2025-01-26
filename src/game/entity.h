@@ -3,9 +3,13 @@
 
 #include "../util/util.h"
 
-#define NUM_ENTITIES 1
+#define NUM_ENTITIES 5
 typedef enum {
     ENT_PUBBLES = 0,
+    ENT_SHIRT,
+    ENT_PANT,
+    ENT_SOCKS,
+    ENT_BOSS
 } EntityID;
 
 typedef struct {

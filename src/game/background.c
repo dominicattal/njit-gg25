@@ -45,31 +45,27 @@ void background_context_init(void)
     ctx.current_background_near = BACKGROUND_2;
 }
 
-void background_context_update(vec2 center, f32 zoom)
+static void push_background_data(vec2 center, f32 zoom, Background background, u32 vbo_offset, u32 ebo_offset, i32 mulitplier)
 {
     static i32 dx[] = {0, 0, 1, 1};
     static i32 dy[] = {0, 1, 1, 0};
     static u32 winding[] = { 0, 1, 2, 0, 2, 3 };
 
     for (i32 i = 0; i < 4; i++) {
-        ctx.vbo_buffer[5*i]   = 2 * dx[i] - 1;
-        ctx.vbo_buffer[5*i+1] = 2 * dy[i] - 1;
-        ctx.vbo_buffer[5*i+2] = dx[i];
-        ctx.vbo_buffer[5*i+3] = 1-dy[i];
-        ctx.vbo_buffer[5*i+4] = background_tex_map[ctx.current_background_far];
+        ctx.vbo_buffer[vbo_offset+5*i]   = 2 * dx[i] - 1;
+        ctx.vbo_buffer[vbo_offset+5*i+1] = 2 * dy[i] - 1;
+        ctx.vbo_buffer[vbo_offset+5*i+2] = dx[i];
+        ctx.vbo_buffer[vbo_offset+5*i+3] = 1-dy[i];
+        ctx.vbo_buffer[vbo_offset+5*i+4] = background_tex_map[background];
     }
     for (i32 i = 0; i < 6; i++)
-        ctx.ebo_buffer[i] = winding[i];
+        ctx.ebo_buffer[ebo_offset+i] = winding[i] + ebo_offset * 2 / 3;
+}
 
-    for (i32 i = 0; i < 4; i++) {
-        ctx.vbo_buffer[20+5*i]   = 2 * dx[i] - 1;
-        ctx.vbo_buffer[20+5*i+1] = 2 * dy[i] - 1;
-        ctx.vbo_buffer[20+5*i+2] = dx[i];
-        ctx.vbo_buffer[20+5*i+3] = 1-dy[i];
-        ctx.vbo_buffer[20+5*i+4] = background_tex_map[ctx.current_background_near];
-    }
-    for (i32 i = 0; i < 6; i++)
-        ctx.ebo_buffer[6+i] = winding[i] + 4;
+void background_context_update(vec2 center, f32 zoom)
+{
+    push_background_data(center, zoom, ctx.current_background_far, 0, 0, 1.0);
+    //push_background_data(center, zoom, ctx.current_background_near, 20, 6, 2.0);
 }
 
 void background_context_destroy(void)

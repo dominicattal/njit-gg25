@@ -24,7 +24,7 @@ void array_push(Array* arr, void* element)
 void* array_pop(Array* arr, i32 idx)
 {
     void* element = arr->buffer[idx];
-    arr->buffer[idx] = arr->buffer[arr->length--];
+    arr->buffer[idx] = arr->buffer[--arr->length];
     if (arr->length == 0) {
         free(arr->buffer);
         arr->buffer = NULL;
@@ -33,7 +33,7 @@ void* array_pop(Array* arr, i32 idx)
     return element;
 }
 
-void*  array_get(Array* arr, i32 idx)
+void* array_get(Array* arr, i32 idx)
 {
     return arr->buffer[idx];
 }

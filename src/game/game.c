@@ -2,6 +2,7 @@
 #include "../renderer/renderer.h"
 #include "../window/window.h"
 #include "entity.h"
+#include "platform.h"
 #include "background.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,6 +15,7 @@ typedef struct {
     vec2 center;
     f32 zoom;
     f64 dt;
+    bool started;
     pthread_t thread_id;
     bool kill_thread;
     sem_t mutex;
@@ -28,8 +30,9 @@ static void* game_update(void* vargp)
         start = get_time();
         sem_wait(&game.mutex);
         entity_context_update(game.dt);
-        if (game.player != NULL && game.player->position.x > 0)
-            game.center = game.player->position;
+        platform_context_update(game.dt);
+        /* if (game.player != NULL && game.player->position.x > 0)
+            game.center = game.player->position; */
         background_context_update(game.center, game.zoom);
         sem_post(&game.mutex);
         game.dt = get_time() - start;
@@ -39,7 +42,7 @@ static void* game_update(void* vargp)
 void game_init(void)
 {
     game.player = NULL;
-    game.zoom = 0.3;
+    game.zoom = 0.2;
     game.dt = 0;
     glGenBuffers(1, &game.view_ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, game.view_ubo);
@@ -48,6 +51,7 @@ void game_init(void)
     glBindBufferBase(GL_UNIFORM_BUFFER, UBO_VIEW, game.view_ubo);
 
     entity_context_init();
+    platform_context_init();
     background_context_init();
     game.center = vec2_create(0, 0);
     game.kill_thread = FALSE;
@@ -84,6 +88,12 @@ void game_start(void)
     sem_wait(&game.mutex);
     game.player = entity_create(ENT_PUBBLES);
     game.player->position = vec2_create(game.center.x - game.player->size.x / 2, game.center.y);
+    game.started = TRUE;
+    Entity* ent = entity_create(ENT_SHIRT);
+    ent->position = vec2_create(0.5, 0.0);
+    Platform* platform = platform_create(PLATFORM_1);
+    platform->position = vec2_create(-2, -1);
+    platform->size = vec2_create(4, 1);
     sem_post(&game.mutex);
 }
 
@@ -96,6 +106,7 @@ void game_prepare_render(void)
 {
     sem_wait(&game.mutex);
     entity_context_prepare_render();
+    platform_context_prepare_render();
     background_context_prepare_render();
     sem_post(&game.mutex);
     glBindBuffer(GL_UNIFORM_BUFFER, game.view_ubo);
@@ -103,9 +114,13 @@ void game_prepare_render(void)
 }
 
 void game_render(void)
-{    
+{
+    if (!game.started)
+        return;
+
     sem_wait(&game.mutex);
     background_context_render();
+    platform_context_render();
     entity_context_render();
     sem_post(&game.mutex);
 }

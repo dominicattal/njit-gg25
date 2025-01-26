@@ -81,8 +81,10 @@ void entity_context_init(void)
 
 void entity_context_destroy(void)
 {
-    while (!array_empty(ctx.entities))
-        entity_destroy((Entity*)array_pop(ctx.entities, 0));
+    while (!array_empty(ctx.entities)) {
+        Entity* ent = array_pop(ctx.entities, 0);
+        entity_destroy(ent);
+    }
     array_destroy(ctx.entities);
     free(ctx.vbo_buffer);
     free(ctx.ebo_buffer);
@@ -95,7 +97,7 @@ void entity_context_update(f32 dt)
 {
     ctx.vbo_length = 0;
     ctx.ebo_length = 0;
-    for (i32 i = 0; i < ctx.entities->length; i++) {
+    for (i32 i = ctx.entities->length - 1; i >= 0; i--) {
         Entity* ent = array_get(ctx.entities, i);
         entity_update(ent, dt);
         push_entity_into_buffer(ent);
@@ -132,6 +134,8 @@ Entity* entity_create(EntityID id)
     ent->id = id;
     ent->frame = 0;
     ent->facing_left = FALSE;
+    ent->size = vec2_create(1, 1);
+    ent->direction = vec2_create(0, 0);
     switch (id) {
         CASE_CREATE(ENT_PUBBLES, pubbles_create)
     }
@@ -161,6 +165,7 @@ void entity_get_tex_info(Entity* ent, u32* tex, f32* x1, f32* x2, f32* y1, f32* 
 {
     switch (ent->id) {
         CASE_GET_TEX_INFO(ENT_PUBBLES, pubbles_get_tex_info)
+        CASE_GET_TEX_INFO(ENT_SHIRT, shirt_get_tex_info)
     }
 }
 
