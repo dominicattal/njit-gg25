@@ -99,6 +99,11 @@ void entity_context_update(f32 dt)
     ctx.ebo_length = 0;
     for (i32 i = ctx.entities->length - 1; i >= 0; i--) {
         Entity* ent = array_get(ctx.entities, i);
+        if (ent->delete_flag) {
+            array_pop(ctx.entities, i--);
+            entity_destroy(ent);
+            continue;
+        }
         entity_update(ent, dt);
         push_entity_into_buffer(ent);
     }
@@ -139,11 +144,14 @@ Entity* entity_create(EntityID id)
     ent->id = id;
     ent->frame = 0;
     ent->facing_left = FALSE;
+    ent->grounded = FALSE;
+    ent->delete_flag = FALSE;
     ent->position = ent->prev_position = vec2_create(0, 0);
+    ent->velocity = vec2_create(0, 0);
     ent->size = vec2_create(1, 1);
-    ent->direction = vec2_create(0, 0);
     switch (id) {
         CASE_CREATE(ENT_PUBBLES, pubbles_create)
+        CASE_CREATE(ENT_PROJECTILE, proj_create)
     }
     return ent;
 }
@@ -154,14 +162,14 @@ Entity* entity_create(EntityID id)
 void entity_update(Entity* ent, f32 dt)
 {
     ent->prev_position = ent->position;
-    vec2 velocity = vec2_scale(vec2_normalize(ent->direction), ent->speed * dt);
-    ent->position = vec2_add(ent->position, velocity);
-    if (ent->facing_left && velocity.x > 0)
+    ent->position = vec2_add(ent->position, vec2_scale(ent->velocity, dt));
+    if (ent->facing_left && ent->velocity.x > 0)
         ent->facing_left = FALSE;
-    else if (!ent->facing_left && velocity.x < 0)
+    else if (!ent->facing_left && ent->velocity.x < 0)
         ent->facing_left = TRUE;
     switch (ent->id) {
         CASE_UPDATE(ENT_PUBBLES, pubbles_update)
+        CASE_UPDATE(ENT_PROJECTILE, proj_update)
     }
 }
 
@@ -173,6 +181,7 @@ void entity_get_tex_info(Entity* ent, u32* tex, f32* x1, f32* x2, f32* y1, f32* 
     switch (ent->id) {
         CASE_GET_TEX_INFO(ENT_PUBBLES, pubbles_get_tex_info)
         CASE_GET_TEX_INFO(ENT_SHIRT, shirt_get_tex_info)
+        CASE_GET_TEX_INFO(ENT_PROJECTILE, proj_get_tex_info)
     }
 }
 
@@ -183,6 +192,7 @@ void entity_destroy(Entity* ent)
 {
     switch (ent->id) {
         CASE_DESTROY(ENT_PUBBLES, pubbles_destroy)
+        CASE_DESTROY(ENT_PROJECTILE, proj_destroy)
     }
     free(ent);
 }

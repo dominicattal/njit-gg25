@@ -28,4 +28,10 @@ void boss_get_tex_info(Entity* ent, u32* tex, f32* x1, f32* x2, f32* y1, f32* y2
 void boss_update(Entity* ent, f32 dt);
 void boss_destroy(Entity* ent);
 
+void proj_create(Entity* ent);
+void proj_get_tex_info(Entity* ent, u32* tex, f32* x1, f32* x2, f32* y1, f32* y2);
+void proj_update(Entity* ent, f32 dt);
+void proj_destroy(Entity* ent);
+
+
 #endif

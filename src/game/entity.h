@@ -3,13 +3,14 @@
 
 #include "../util/util.h"
 
-#define NUM_ENTITIES 5
+#define NUM_ENTITIES 6
 typedef enum {
     ENT_PUBBLES = 0,
     ENT_SHIRT,
     ENT_PANT,
     ENT_SOCKS,
-    ENT_BOSS
+    ENT_BOSS,
+    ENT_PROJECTILE
 } EntityID;
 
 typedef struct {
@@ -17,10 +18,13 @@ typedef struct {
     u32 frame;
     vec2 position;
     vec2 prev_position;
-    vec2 direction;
+    vec2 velocity;
     f32 speed;
+    f32 hitbox_radius;
     vec2 size;
+    bool grounded;
     bool facing_left;
+    bool delete_flag;
     void* data;
 } Entity;
 

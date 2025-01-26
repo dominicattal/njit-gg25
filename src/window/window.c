@@ -145,6 +145,11 @@ static void framebuffer_size_callback(GLFWwindow* handle, i32 width, i32 height)
 
 static void mouse_button_callback(GLFWwindow* handle, i32 button, i32 action)
 {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        vec2 dir = vec2_create(window.cursor.x - window.width / 2, window.height / 2 - window.cursor.y);
+        dir = vec2_normalize(dir);
+        game_shoot(dir);
+    }
     gui_mouse_button_callback(button, action);
 }
 

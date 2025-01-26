@@ -39,10 +39,6 @@ void pubbles_create(Entity* entity)
     Data* data = malloc(sizeof(Data));
     entity->data = data;
     data->timer = 0;
-    entity->position = vec2_create(0, 0);
-    entity->direction = vec2_create(0, 0);
-    entity->speed = 10;
-    entity->size = vec2_create(1, 1);
 }
 
 void pubbles_update(Entity* entity, f32 dt)

@@ -10,6 +10,7 @@ void game_start(void);
 
 void game_move(vec2 dir, f32 dt);
 void game_zoom(i32 mag, f32 dt);
+void game_shoot(vec2 direction);
 
 void game_prepare_render(void);
 void game_render(void);
