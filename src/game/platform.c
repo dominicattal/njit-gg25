@@ -107,6 +107,11 @@ void platform_context_render(void)
     glDrawElements(GL_TRIANGLES, ctx.ebo_length, GL_UNSIGNED_INT, 0);
 }
 
+const Array* platform_context_get_platforms(void)
+{
+    return ctx.platforms;
+}
+
 // --------------------------------
 
 Platform* platform_create(PlatformID id)

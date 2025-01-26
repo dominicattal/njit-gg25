@@ -122,6 +122,11 @@ void entity_context_render(void)
     glDrawElements(GL_TRIANGLES, ctx.ebo_length, GL_UNSIGNED_INT, 0);
 }
 
+const Array* entity_context_get_entities(void)
+{
+    return ctx.entities;
+}
+
 // ----------------------------------
 
 #define CASE_CREATE(_ent, _func) \
@@ -134,6 +139,7 @@ Entity* entity_create(EntityID id)
     ent->id = id;
     ent->frame = 0;
     ent->facing_left = FALSE;
+    ent->position = ent->prev_position = vec2_create(0, 0);
     ent->size = vec2_create(1, 1);
     ent->direction = vec2_create(0, 0);
     switch (id) {
@@ -147,6 +153,7 @@ Entity* entity_create(EntityID id)
 
 void entity_update(Entity* ent, f32 dt)
 {
+    ent->prev_position = ent->position;
     vec2 velocity = vec2_scale(vec2_normalize(ent->direction), ent->speed * dt);
     ent->position = vec2_add(ent->position, velocity);
     if (ent->facing_left && velocity.x > 0)

@@ -17,6 +17,7 @@ void platform_context_update(f32 dt);
 void platform_context_destroy(void);
 void platform_context_prepare_render(void);
 void platform_context_render(void);
+const Array* platform_context_get_platforms(void);
 
 Platform* platform_create(PlatformID id);
 void platform_update(Platform* platform, f32 dt);

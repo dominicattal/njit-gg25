@@ -23,14 +23,48 @@ typedef struct {
 
 static Game game;
 
+static void collide_entity_platform(Entity* entity, Platform* platform)
+{
+    f32 ex1, ex2, ey1, ey2;
+    f32 px1, px2, py1, py2;
+    ex1 = entity->position.x; ex2 = entity->position.x + entity->size.x;
+    ey1 = entity->position.y; ey2 = entity->position.y + entity->size.y;
+    px1 = platform->position.x; px2 = platform->position.x + platform->size.x;
+    py1 = platform->position.y; py2 = platform->position.y + platform->size.y;
+    if (!(ex2 <= px1 || ex1 >= px2 || ey2 <= px1 || ey1 >= py2)) {
+        if (entity->prev_position.x >= px2)
+            entity->position.x = px2;
+        else if (entity->prev_position.y >= py2)
+            entity->position.y = py2;
+        else if (entity->prev_position.x + entity->size.x <= px1)
+            entity->position.x = px1 - entity->size.x;
+        else
+            entity->position.y = py1 - entity->size.y;
+    }
+}
+
+static void collide_entities_platforms(void)
+{
+    Array* entities = entity_context_get_entities();
+    Array* platforms = platform_context_get_platforms();
+    for (i32 i = 0; i < entities->length; i++) {
+        Entity* entity = array_get(entities, i);
+        for (i32 j = 0; j < platforms->length; j++) {
+            Platform* platform = array_get(platforms, j);
+            collide_entity_platform(entity, platform);
+        }
+    }
+}
+
 static void* game_update(void* vargp)
 {
     f64 start;
     while (!game.kill_thread) {
         start = get_time();
         sem_wait(&game.mutex);
-        entity_context_update(game.dt);
-        platform_context_update(game.dt);
+        entity_context_update((game.dt > 0.1) ? 0.1 : game.dt);
+        platform_context_update((game.dt > 0.1) ? 0.1 : game.dt);
+        collide_entities_platforms();
         /* if (game.player != NULL && game.player->position.x > 0)
             game.center = game.player->position; */
         background_context_update(game.center, game.zoom);
@@ -89,10 +123,10 @@ void game_start(void)
     game.player = entity_create(ENT_PUBBLES);
     game.player->position = vec2_create(game.center.x - game.player->size.x / 2, game.center.y);
     game.started = TRUE;
-    Entity* ent = entity_create(ENT_SHIRT);
-    ent->position = vec2_create(0.5, 0.0);
+    //Entity* ent = entity_create(ENT_SHIRT);
+    //ent->position = vec2_create(0.5, 0.0);
     Platform* platform = platform_create(PLATFORM_1);
-    platform->position = vec2_create(-2, -1);
+    platform->position = vec2_create(-2, -2);
     platform->size = vec2_create(4, 1);
     sem_post(&game.mutex);
 }

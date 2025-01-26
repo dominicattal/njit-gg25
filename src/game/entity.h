@@ -16,6 +16,7 @@ typedef struct {
     u32 id;
     u32 frame;
     vec2 position;
+    vec2 prev_position;
     vec2 direction;
     f32 speed;
     vec2 size;
@@ -28,6 +29,8 @@ void entity_context_update(f32 dt);
 void entity_context_prepare_render(void);
 void entity_context_render(void);
 void entity_context_destroy(void);
+
+const Array* entity_context_get_entities(void);
 
 Entity* entity_create(EntityID id);
 void entity_update(Entity* entity, f32 dt);
