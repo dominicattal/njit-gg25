@@ -47,7 +47,6 @@ void gui_init(void)
     gui.root = comp_create(0, 0, xres, yres, COMP_DEFAULT);
     comp_set_color(gui.root, 0, 0, 0, 0);
     comp_set_hoverable(gui.root, FALSE);
-    gui_load(GUI_DEFAULT);
     gui.initialized = TRUE;
 
     glGenVertexArrays(1, &gui.data.comp_vao);
@@ -168,7 +167,7 @@ void gui_cursor_callback(void)
 
 static void gui_loader_init(void)
 {
-    preset_functions[GUI_DEFAULT] = gui_preset_default;
+    preset_functions[GUI_MAIN_MENU] = gui_preset_default;
     preset_functions[GUI_SLIDESHOW] = gui_preset_slideshow;
     preset_functions[GUI_GAME] = gui_preset_game;
 }

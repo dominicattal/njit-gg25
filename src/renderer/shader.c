@@ -111,6 +111,17 @@ void shader_init(void)
     delete(vert);
     delete(frag);
     shader_bind_uniform_block(SHADER_GAME, UBO_VIEW, "View");
+
+    vert = compile(GL_VERTEX_SHADER, "src/renderer/shaders/background.vert");
+    frag = compile(GL_FRAGMENT_SHADER, "src/renderer/shaders/background.frag");
+    attach(SHADER_BACKGROUND, vert);
+    attach(SHADER_BACKGROUND, frag);
+    link(SHADER_BACKGROUND);
+    detach(SHADER_BACKGROUND, vert);
+    detach(SHADER_BACKGROUND, frag);
+    delete(vert);
+    delete(frag);
+    shader_bind_uniform_block(SHADER_BACKGROUND, UBO_VIEW, "View");
 }
 
 void shader_use(Shader id)

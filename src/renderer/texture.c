@@ -41,7 +41,7 @@ typedef struct {
     i32 location;
 } TEX;
 
-#define NUM_IMAGES_TO_PACK 8
+#define NUM_IMAGES_TO_PACK 9
 static Image images[NUM_IMAGES_TO_PACK] = {
     (Image) { TEX_COLOR,   "assets/textures/color.png" },
     (Image) { TEX_PUBBLES, "assets/textures/pubbles.png" },
@@ -51,6 +51,7 @@ static Image images[NUM_IMAGES_TO_PACK] = {
     (Image) { TEX_CUTSCENE_3, "assets/textures/start-cutscene-3.png"},
     (Image) { TEX_CUTSCENE_4, "assets/textures/start-cutscene-4.png"},
     (Image) { TEX_CUTSCENE_5, "assets/textures/start-cutscene-5.png"},
+    (Image) { TEX_BACKGROUND_1, "assets/textures/background-1.jpg"},
 };
 
 typedef struct {
@@ -213,6 +214,10 @@ static void initialize_rects(TEX* textures, stbrp_rect* rects_rgb, stbrp_rect* r
     num_rects_rgb = num_rects_rgba = 0;
     for (i = 0; i < NUM_IMAGES_TO_PACK; i++) {
         image_data[i] = stbi_load(images[i].path, &width, &height, &num_channels, 0);
+        if (image_data[i] == NULL) {
+            printf("Could not open %s\n", images[i].path);
+            continue;
+        }
         if (num_channels == 3) {
             load_rgb:
             rects_rgb[num_rects_rgb].id = images[i].tex;
@@ -369,6 +374,8 @@ void texture_init(void)
     glUniform1iv(shader_get_uniform_location(SHADER_GUI, "textures"), NUM_TEXTURE_UNITS, texs);
     shader_use(SHADER_GAME);
     glUniform1iv(shader_get_uniform_location(SHADER_GAME, "textures"), NUM_TEXTURE_UNITS, texs);
+    shader_use(SHADER_BACKGROUND);
+    glUniform1iv(shader_get_uniform_location(SHADER_BACKGROUND, "textures"), NUM_TEXTURE_UNITS, texs);
 
     glGenBuffers(1, &ctx.tex_ssbo);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ctx.tex_ssbo);

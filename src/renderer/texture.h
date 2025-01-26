@@ -3,7 +3,7 @@
 
 #include "../util/util.h"
 
-#define NUM_TEXTURES 5
+#define NUM_TEXTURES 8
 
 typedef enum {
     TEX_NONE = 0,
@@ -15,6 +15,7 @@ typedef enum {
     TEX_CUTSCENE_3,
     TEX_CUTSCENE_4,
     TEX_CUTSCENE_5,
+    TEX_BACKGROUND_1,
     TEX_BITMAP,
 } Texture;
 

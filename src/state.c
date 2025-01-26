@@ -15,6 +15,9 @@ void state_init(void)
     audio_init();
     gui_init();
     game_init();
+
+    gui_load(GUI_GAME);
+    game_start();
 }
 
 static void process_input(f32 dt)

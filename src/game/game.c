@@ -2,6 +2,7 @@
 #include "../renderer/renderer.h"
 #include "../window/window.h"
 #include "entity.h"
+#include "background.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -27,8 +28,9 @@ static void* game_update(void* vargp)
         start = get_time();
         sem_wait(&game.mutex);
         entity_context_update(game.dt);
-        /* if (game.player != NULL)
-            game.center = game.player->position; */
+        if (game.player != NULL && game.player->position.x > 0)
+            game.center = game.player->position;
+        background_context_update(game.center, game.zoom);
         sem_post(&game.mutex);
         game.dt = get_time() - start;
     }
@@ -46,6 +48,7 @@ void game_init(void)
     glBindBufferBase(GL_UNIFORM_BUFFER, UBO_VIEW, game.view_ubo);
 
     entity_context_init();
+    background_context_init();
     game.center = vec2_create(0, 0);
     game.kill_thread = FALSE;
     sem_init(&game.mutex, 0, 1);
@@ -58,6 +61,8 @@ void game_destroy(void)
     pthread_join(game.thread_id, NULL);
     sem_destroy(&game.mutex);
     glDeleteBuffers(1, &game.view_ubo);
+    entity_context_destroy();
+    background_context_destroy();
 }
 
 void game_move(vec2 dir, f32 dt)
@@ -91,6 +96,7 @@ void game_prepare_render(void)
 {
     sem_wait(&game.mutex);
     entity_context_prepare_render();
+    background_context_prepare_render();
     sem_post(&game.mutex);
     glBindBuffer(GL_UNIFORM_BUFFER, game.view_ubo);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, 2 * sizeof(f32), &game.center);
@@ -99,6 +105,7 @@ void game_prepare_render(void)
 void game_render(void)
 {    
     sem_wait(&game.mutex);
+    background_context_render();
     entity_context_render();
     sem_post(&game.mutex);
 }

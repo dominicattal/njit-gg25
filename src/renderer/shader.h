@@ -3,11 +3,12 @@
 
 #include "../util/util.h"
 
-#define NUM_SHADERS 2
+#define NUM_SHADERS 3
 
 typedef enum {
     SHADER_GUI = 0,
-    SHADER_GAME = 1
+    SHADER_GAME,
+    SHADER_BACKGROUND
 } Shader;
 
 void shader_init(void);

@@ -27,6 +27,7 @@ void* array_pop(Array* arr, i32 idx)
     arr->buffer[idx] = arr->buffer[arr->length--];
     if (arr->length == 0) {
         free(arr->buffer);
+        arr->buffer = NULL;
         arr->capacity = 0;
     }
     return element;
