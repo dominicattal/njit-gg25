@@ -3,10 +3,11 @@
 
 #include "../util/util.h"
 
-#define NUM_PRESETS 2
+#define NUM_PRESETS 3
 
 typedef enum {
     GUI_DEFAULT = 0,
+    GUI_SLIDESHOW,
     GUI_GAME
 } GUIPreset;
 

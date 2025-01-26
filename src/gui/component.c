@@ -28,9 +28,10 @@ Component* comp_create(i16 x, i16 y, i16 w, i16 h, CompID id)
     Component* comp = malloc(sizeof(Component));
     comp->info1 = comp->info2 = 0;
     comp_set_bbox(comp, x, y, w, h);
-    comp_set_color(comp, 0, 0, 0, 255);
+    comp_set_color(comp, 255, 255, 255, 255);
     comp_set_id(comp, id);
     comp_set_visible(comp, TRUE);
+    comp_set_tex(comp, TEX_COLOR);
     comp->children = NULL;
     comp->data = NULL;
     component_functions[comp_id(comp)][COMP_FUNC_INIT](comp);
@@ -197,6 +198,8 @@ static void initialize_functions(void)
     component_functions[COMP_BUTTON][COMP_FUNC_CLICK]       = (void_func_ptr)comp_button_click;
     component_functions[COMP_BUTTON][COMP_FUNC_DESTROY]     = (void_func_ptr)comp_button_destroy;
     component_functions[COMP_SLIDESHOW][COMP_FUNC_INIT]     = (void_func_ptr)comp_slideshow_init;
+    component_functions[COMP_SLIDESHOW][COMP_FUNC_UPDATE]   = (void_func_ptr)comp_slideshow_update;
+    component_functions[COMP_SLIDESHOW][COMP_FUNC_KEY]      = (void_func_ptr)comp_slideshow_key;
     component_functions[COMP_SLIDESHOW][COMP_FUNC_DESTROY]  = (void_func_ptr)comp_slideshow_destroy;
 }
 
@@ -437,6 +440,9 @@ i32 comp_num_children(Component* comp) {
     if (comp_is_text(comp))
         return 0;
     return (comp->info2 >> NC_SHIFT) & SMASK(NC_BITS);
+}
+i32  comp_tex(Component* comp){
+    return (comp->info2 >> TX_SHIFT) & SMASK(TX_BITS);
 }
 bool comp_is_text(Component* comp) {
     return (comp->info1 >> IT_SHIFT) & SMASK(IT_BITS);

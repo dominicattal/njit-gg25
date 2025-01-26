@@ -2,10 +2,9 @@
 #include "../../game/game.h"
 #include "../gui.h"
 
-void start_game(void)
+void start_slideshow(void)
 {  
-    game_start();
-    gui_load(GUI_GAME);
+    gui_load(GUI_SLIDESHOW);
 }
 
 void gui_preset_default(Component* root)
@@ -30,6 +29,6 @@ void gui_preset_default(Component* root)
     comp_set_color(play_button, 255, 0, 255, 75);
     comp_set_clickable(play_button, TRUE);
     comp_set_text(play_button, "PLAY");
-    comp_button_set_function(play_button, start_game);
+    comp_button_set_function(play_button, start_slideshow);
     comp_attach(root, play_button);
 }

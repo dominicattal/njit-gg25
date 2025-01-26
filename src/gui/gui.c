@@ -169,6 +169,7 @@ void gui_cursor_callback(void)
 static void gui_loader_init(void)
 {
     preset_functions[GUI_DEFAULT] = gui_preset_default;
+    preset_functions[GUI_SLIDESHOW] = gui_preset_slideshow;
     preset_functions[GUI_GAME] = gui_preset_game;
 }
 
@@ -399,10 +400,10 @@ static void update_data_helper(Component* comp)
     window_pixel_to_screen_bbox(cx, cy, cw, ch, &x1, &y1, &x2, &y2);
     r = cr / 255.0f, g = cg / 255.0f, b = cb / 255.0f, a = ca / 255.0f;
 
-    A = x1, A = y1, A = 0.0, A = 1.0, A = r, A = g, A = b, A = a, A = TEX_COLOR;
-    A = x1, A = y2, A = 0.0, A = 0.0, A = r, A = g, A = b, A = a, A = TEX_COLOR;
-    A = x2, A = y2, A = 1.0, A = 0.0, A = r, A = g, A = b, A = a, A = TEX_COLOR;
-    A = x2, A = y1, A = 1.0, A = 1.0, A = r, A = g, A = b, A = a, A = TEX_COLOR;
+    A = x1, A = y1, A = 0.0, A = 1.0, A = r, A = g, A = b, A = a, A = comp_tex(comp);
+    A = x1, A = y2, A = 0.0, A = 0.0, A = r, A = g, A = b, A = a, A = comp_tex(comp);
+    A = x2, A = y2, A = 1.0, A = 0.0, A = r, A = g, A = b, A = a, A = comp_tex(comp);
+    A = x2, A = y1, A = 1.0, A = 1.0, A = r, A = g, A = b, A = a, A = comp_tex(comp);
     B = idx, B = idx + 2, B = idx + 1, B = idx, B = idx + 3, B = idx + 2;
 
     update_data_text(comp);

@@ -115,6 +115,7 @@ void comp_get_font_size(Component* comp, i32* fs);
 // Second set of getters
 CompID comp_id(Component* comp);
 i32  comp_num_children(Component* comp);
+i32  comp_tex(Component* comp);
 bool comp_is_text(Component* comp);
 bool comp_is_hoverable(Component* comp);
 bool comp_is_hovered(Component* comp);

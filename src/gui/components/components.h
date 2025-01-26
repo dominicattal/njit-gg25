@@ -19,6 +19,8 @@ void comp_button_hover(Component* comp, bool status);
 void comp_button_destroy(Component* comp);
 void comp_button_set_function(Component* comp, void (*func_ptr)());
 void comp_slideshow_init(Component* comp);
+void comp_slideshow_update(Component* comp, f64 dt);
+void comp_slideshow_key(Component* comp, i32 key, i32 scancode, i32 action, i32 mods);
 void comp_slideshow_destroy(Component* comp);
 
 #endif
