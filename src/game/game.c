@@ -77,7 +77,7 @@ static void* game_update(void* vargp)
         collide_entities_platforms(game.dt);
         if (game.player != NULL) {
             game.center.x = game.player->position.x + game.player->size.x / 2;
-            game.center.y = game.player->position.y;
+            game.center.y = game.player->position.y + game.player->size.y / 2;
         }
         background_context_update(game.center, game.zoom);
         sem_post(&game.mutex);
@@ -132,14 +132,15 @@ void game_zoom(i32 mag, f32 dt)
     glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(f32), sizeof(f32), &game.zoom);
 }
 
-void game_shoot(vec2 direction)
+void game_shoot(vec2 cursor_pos)
 {
     if (game.player == NULL) 
         return;
+
     sem_wait(&game.mutex);
     Entity* proj = entity_create(ENT_PROJECTILE);
-    proj->position = vec2_add(game.player->position, vec2_scale(game.player->size, 0.5));
-    proj->velocity = vec2_scale(direction, 10);
+    proj->position = vec2_add(game.player->position, vec2_sub(vec2_scale(game.player->size, 0.5), vec2_scale(proj->size, 0.5)));
+    proj->velocity = vec2_scale(cursor_pos, 10);
     sem_post(&game.mutex);
 }
 

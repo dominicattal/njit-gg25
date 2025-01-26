@@ -93,10 +93,32 @@ void entity_context_destroy(void)
     glDeleteBuffers(1, &ctx.entity_ebo);
 }
 
+static bool collide(Entity* ent1, Entity* ent2)
+{
+
+}
+
+static void parse_hit(Entity* ent1, Entity* ent2)
+{
+    if (ent1->delete_flag || ent2->delete_flag)
+        return;
+
+    
+} 
+
 void entity_context_update(f32 dt)
 {
     ctx.vbo_length = 0;
     ctx.ebo_length = 0;
+    for (i32 i = 0; i < ctx.entities->length; i++) {
+        Entity* ent1 = array_get(ctx.entities, i);
+        for (i32 j = 0; j < i; j++) {
+            Entity* ent2 = array_get(ctx.entities, j);
+            if (collide(ent1, ent2)) {
+                parse_hit(ent1, ent2);
+            }
+        }
+    }
     for (i32 i = ctx.entities->length - 1; i >= 0; i--) {
         Entity* ent = array_get(ctx.entities, i);
         if (ent->delete_flag) {

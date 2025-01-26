@@ -25,6 +25,7 @@ typedef struct {
     bool grounded;
     bool facing_left;
     bool delete_flag;
+    bool friendly;
     void* data;
 } Entity;
 
