@@ -79,12 +79,17 @@ void entity_context_init(void)
     ctx.ebo_buffer = NULL;
 }
 
-void entity_context_destroy(void)
+void entity_context_clear_entities(void)
 {
     while (!array_empty(ctx.entities)) {
         Entity* ent = array_pop(ctx.entities, 0);
         entity_destroy(ent);
     }
+}
+
+void entity_context_destroy(void)
+{
+    entity_context_clear_entities();
     array_destroy(ctx.entities);
     free(ctx.vbo_buffer);
     free(ctx.ebo_buffer);
@@ -95,15 +100,34 @@ void entity_context_destroy(void)
 
 static bool collide(Entity* ent1, Entity* ent2)
 {
-
+    return !(
+        ent1->position.x + ent1->size.x <= ent2->position.x
+     || ent2->position.x + ent2->size.x <= ent1->position.x
+     || ent1->position.y + ent1->size.y <= ent2->position.y
+     || ent2->position.y + ent2->size.y <= ent1->position.y
+    );
 }
 
 static void parse_hit(Entity* ent1, Entity* ent2)
 {
-    if (ent1->delete_flag || ent2->delete_flag)
+    if (ent1->health <= 0 || ent2->health <= 0)
         return;
 
-    
+    if (!(ent1->friendly ^ ent2->friendly))
+        return;
+
+    if (ent1->id == ent2->id)
+        return;
+
+    if (ent1->id > ent2->id) {
+        Entity* tmp = ent1;
+        ent1 = ent2;
+        ent2 = tmp;
+    }
+
+    if (ent2->id == ENT_PROJECTILE) {
+        ent2->health = 0;
+    }
 } 
 
 void entity_context_update(f32 dt)
@@ -114,14 +138,13 @@ void entity_context_update(f32 dt)
         Entity* ent1 = array_get(ctx.entities, i);
         for (i32 j = 0; j < i; j++) {
             Entity* ent2 = array_get(ctx.entities, j);
-            if (collide(ent1, ent2)) {
+            if (collide(ent1, ent2))
                 parse_hit(ent1, ent2);
-            }
         }
     }
     for (i32 i = ctx.entities->length - 1; i >= 0; i--) {
         Entity* ent = array_get(ctx.entities, i);
-        if (ent->delete_flag) {
+        if (ent->health <= 0) {
             array_pop(ctx.entities, i--);
             entity_destroy(ent);
             continue;
@@ -167,10 +190,11 @@ Entity* entity_create(EntityID id)
     ent->frame = 0;
     ent->facing_left = FALSE;
     ent->grounded = FALSE;
-    ent->delete_flag = FALSE;
     ent->position = ent->prev_position = vec2_create(0, 0);
     ent->velocity = vec2_create(0, 0);
     ent->size = vec2_create(1, 1);
+    ent->friendly = FALSE;
+    ent->health = 1;
     switch (id) {
         CASE_CREATE(ENT_PUBBLES, pubbles_create)
         CASE_CREATE(ENT_PROJECTILE, proj_create)

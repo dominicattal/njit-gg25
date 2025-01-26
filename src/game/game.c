@@ -6,6 +6,7 @@
 #include "background.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <glfw.h>
 #include <pthread.h>
 #include <semaphore.h>
 
@@ -61,7 +62,20 @@ static void collide_entities_platforms(f32 dt)
         if (!entity->grounded && entity->id != ENT_PROJECTILE) {
             entity->velocity.y -= 3 * dt;
         } else if (entity->grounded && entity->id == ENT_PROJECTILE) {
-            entity->delete_flag = TRUE;
+            entity->health = 0;
+        }
+    }
+}
+
+static void check_entities_out_of_bounds(void)
+{
+    Array* entities = entity_context_get_entities();
+    for (i32 i = 0; i < entities->length; i++) {
+        Entity* ent = array_get(entities, i);
+        if (ent->position.y < -20) {
+            ent->health = 0;
+            if (ent == game.player)
+                game.player = NULL;
         }
     }
 }
@@ -75,6 +89,7 @@ static void* game_update(void* vargp)
         entity_context_update((game.dt > 0.1) ? 0.1 : game.dt);
         platform_context_update((game.dt > 0.1) ? 0.1 : game.dt);
         collide_entities_platforms(game.dt);
+        check_entities_out_of_bounds();
         if (game.player != NULL) {
             game.center.x = game.player->position.x + game.player->size.x / 2;
             game.center.y = game.player->position.y + game.player->size.y / 2;
@@ -136,26 +151,45 @@ void game_shoot(vec2 cursor_pos)
 {
     if (game.player == NULL) 
         return;
-
     sem_wait(&game.mutex);
     Entity* proj = entity_create(ENT_PROJECTILE);
     proj->position = vec2_add(game.player->position, vec2_sub(vec2_scale(game.player->size, 0.5), vec2_scale(proj->size, 0.5)));
     proj->velocity = vec2_scale(cursor_pos, 10);
+    proj->friendly = TRUE;
     sem_post(&game.mutex);
 }
 
-void game_start(void)
+static void load_game_objects(void)
 {
-    sem_wait(&game.mutex);
     game.player = entity_create(ENT_PUBBLES);
-    game.player->position = vec2_create(game.center.x - game.player->size.x / 2, game.center.y);
-    game.started = TRUE;
+    game.player->position = vec2_create(0, 0);
     Entity* ent = entity_create(ENT_SHIRT);
     ent->position = vec2_create(0.5, 1.0);
     Platform* platform = platform_create(PLATFORM_1);
     platform->position = vec2_create(-2, -2);
     platform->size = vec2_create(4, 0.5);
+}
+
+void game_start(void)
+{
+    sem_wait(&game.mutex);
+    game.started = TRUE;
+    load_game_objects();
     sem_post(&game.mutex);
+}
+
+void game_restart(void)
+{
+    sem_wait(&game.mutex);
+    entity_context_clear_entities();
+    platform_context_clear_platforms();
+    load_game_objects();
+    sem_post(&game.mutex);
+}
+
+bool game_player_dead(void)
+{
+    return game.player == NULL;
 }
 
 f64 game_dt(void)
@@ -184,4 +218,10 @@ void game_render(void)
     platform_context_render();
     entity_context_render();
     sem_post(&game.mutex);
+}
+
+void game_key_callback(i32 key, i32 scancode, i32 action, i32 mods)
+{
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS && game.player == NULL && game.started)
+        game_restart();
 }

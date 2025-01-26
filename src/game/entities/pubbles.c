@@ -39,6 +39,7 @@ void pubbles_create(Entity* entity)
     Data* data = malloc(sizeof(Data));
     entity->data = data;
     data->timer = 0;
+    entity->friendly = TRUE;
 }
 
 void pubbles_update(Entity* entity, f32 dt)

@@ -176,6 +176,7 @@ static void key_callback(GLFWwindow* handle, i32 key, i32 scancode, i32 action, 
         exit(0);
     else if (key == GLFW_KEY_F && action == GLFW_PRESS)
         toggle_fullscreen();
+    game_key_callback(key, scancode, action, mods);
     gui_key_callback(key, scancode, action, mods);
 }
 

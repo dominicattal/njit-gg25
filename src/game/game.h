@@ -14,5 +14,8 @@ void game_shoot(vec2 cursor_pos);
 
 void game_prepare_render(void);
 void game_render(void);
+void game_key_callback(i32 key, i32 scancode, i32 action, i32 mods);
+
+bool game_player_dead(void);
 
 #endif

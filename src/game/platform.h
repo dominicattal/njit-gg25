@@ -14,6 +14,7 @@ typedef struct {
 
 void platform_context_init(void);
 void platform_context_update(f32 dt);
+void platform_context_clear_platforms(void);
 void platform_context_destroy(void);
 void platform_context_prepare_render(void);
 void platform_context_render(void);

@@ -76,12 +76,18 @@ void platform_context_update(f32 dt)
     }
 }
 
-void platform_context_destroy(void)
+void platform_context_clear_platforms(void)
 {
     while (!array_empty(ctx.platforms)) {
         Platform* platform = array_pop(ctx.platforms, 0);
         platform_destroy(platform);
     }
+}
+
+void platform_context_destroy(void)
+{
+    platform_context_clear_platforms();
+    array_destroy(ctx.platforms);
     free(ctx.vbo_buffer);
     free(ctx.ebo_buffer);
     glDeleteVertexArrays(1, &ctx.platform_vao);

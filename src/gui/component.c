@@ -201,6 +201,8 @@ static void initialize_functions(void)
     component_functions[COMP_SLIDESHOW][COMP_FUNC_UPDATE]   = (void_func_ptr)comp_slideshow_update;
     component_functions[COMP_SLIDESHOW][COMP_FUNC_KEY]      = (void_func_ptr)comp_slideshow_key;
     component_functions[COMP_SLIDESHOW][COMP_FUNC_DESTROY]  = (void_func_ptr)comp_slideshow_destroy;
+    component_functions[COMP_DEATH][COMP_FUNC_INIT]         = (void_func_ptr)comp_death_init;
+    component_functions[COMP_DEATH][COMP_FUNC_UPDATE]       = (void_func_ptr)comp_death_update;
 }
 
 // ---------------------------------------------------------------------------

@@ -22,5 +22,7 @@ void comp_slideshow_init(Component* comp);
 void comp_slideshow_update(Component* comp, f64 dt);
 void comp_slideshow_key(Component* comp, i32 key, i32 scancode, i32 action, i32 mods);
 void comp_slideshow_destroy(Component* comp);
+void comp_death_init(Component* comp);
+void comp_death_update(Component* comp, f64 dt);
 
 #endif

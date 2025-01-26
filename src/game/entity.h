@@ -22,9 +22,9 @@ typedef struct {
     f32 speed;
     f32 hitbox_radius;
     vec2 size;
+    f32 health;
     bool grounded;
     bool facing_left;
-    bool delete_flag;
     bool friendly;
     void* data;
 } Entity;
@@ -33,6 +33,7 @@ void entity_context_init(void);
 void entity_context_update(f32 dt);
 void entity_context_prepare_render(void);
 void entity_context_render(void);
+void entity_context_clear_entities(void);
 void entity_context_destroy(void);
 
 const Array* entity_context_get_entities(void);
