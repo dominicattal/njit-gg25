@@ -7,7 +7,7 @@
 typedef enum {
     ENT_PUBBLES = 0,
     ENT_SHIRT,
-    ENT_PANT,
+    ENT_PANTS,
     ENT_SOCKS,
     ENT_BOSS,
     ENT_PROJECTILE

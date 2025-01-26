@@ -32,18 +32,19 @@ static void collide_entity_platform(Entity* entity, Platform* platform)
     ey1 = entity->position.y; ey2 = entity->position.y + entity->size.y;
     px1 = platform->position.x; px2 = platform->position.x + platform->size.x;
     py1 = platform->position.y; py2 = platform->position.y + platform->size.y;
-    if (!(ex2 <= px1 || ex1 >= px2 || ey2 <= px1 || ey1 >= py2)) {
+    if (!(ex2 <= px1 || ex1 >= px2 || ey2 <= py1 || ey1 >= py2)) {
         if (entity->prev_position.x >= px2)
             entity->position.x = px2;
         else if (entity->prev_position.y >= py2) {
             entity->position.y = py2;
+            entity->velocity.y = 0;
             entity->grounded = TRUE;
         }
         else if (entity->prev_position.x + entity->size.x <= px1)
             entity->position.x = px1 - entity->size.x;
         else {
             entity->position.y = py1 - entity->size.y;
-            entity->grounded = TRUE;
+            entity->velocity.y = 0;
         }
     }
 }
@@ -59,8 +60,8 @@ static void collide_entities_platforms(f32 dt)
             Platform* platform = array_get(platforms, j);
             collide_entity_platform(entity, platform);
         }
-        if (!entity->grounded && entity->id != ENT_PROJECTILE) {
-            entity->velocity.y -= 3 * dt;
+        if (!entity->grounded && entity->id != ENT_PROJECTILE && entity->id != ENT_BOSS && entity->id != ENT_SOCKS) {
+            entity->velocity.y -= 8 * dt;
         } else if (entity->grounded && entity->id == ENT_PROJECTILE) {
             entity->health = 0;
         }
@@ -134,8 +135,10 @@ void game_move(vec2 dir, f32 dt)
 {
     if (game.player != NULL) {
         game.player->velocity.x = 2 * dir.x;
-        if (game.player->grounded && dir.y > 0)
-            game.player->velocity.y = 2 * dir.y;
+        if (dir.y > 0)
+            game.player->velocity.y += 50 * dt * dir.y;
+        if (game.player->velocity.y > 2)
+            game.player->velocity.y = 2;
     }
     
 }
@@ -143,6 +146,10 @@ void game_move(vec2 dir, f32 dt)
 void game_zoom(i32 mag, f32 dt)
 {
     game.zoom += mag * dt;
+    if (game.zoom > 1)
+        game.zoom = 1;
+    if (game.zoom < 0.008)
+        game.zoom = 0.008;
     glBindBuffer(GL_UNIFORM_BUFFER, game.view_ubo);
     glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(f32), sizeof(f32), &game.zoom);
 }
@@ -159,15 +166,38 @@ void game_shoot(vec2 cursor_pos)
     sem_post(&game.mutex);
 }
 
+#define NUM_PLATFORM_COLS 10
 static void load_game_objects(void)
 {
     game.player = entity_create(ENT_PUBBLES);
     game.player->position = vec2_create(0, 0);
-    Entity* ent = entity_create(ENT_SHIRT);
-    ent->position = vec2_create(0.5, 1.0);
-    Platform* platform = platform_create(PLATFORM_1);
-    platform->position = vec2_create(-2, -2);
-    platform->size = vec2_create(4, 0.5);
+    i32 x = -2;
+    i32 y[4] = {-6, 0, 6, 12};
+    EntityID ents[2] = {ENT_SHIRT, ENT_PANTS};
+    srand(time(NULL));
+    i32 num_enemies;
+    for (i32 i = 0; i < NUM_PLATFORM_COLS; i++) {
+        for (i32 j = 0; j < 4; j++) {
+            Platform* platform = platform_create(PLATFORM_1);
+            platform->position = vec2_create(x, y[j] + (i & 1) * 3);
+            platform->size = vec2_create(4, 0.5);
+            num_enemies = rand() % 4;
+            for (i32 k = 0; k < num_enemies; k++) {
+                Entity* ent = entity_create(ents[rand() % 2]);
+                ent->position = vec2_create(x + 4 * ((f32)rand() / RAND_MAX), platform->position.y + platform->size.y + 0.1);
+            }
+        }
+        num_enemies = rand() % 4;
+        for (i32 k = 0; k < num_enemies; k++) {
+            Entity* ent = entity_create(ENT_SOCKS);
+            ent->position = vec2_create(x + 6, -6 + 18.0 * rand() / RAND_MAX);
+            ent->size = vec2_create(0.5, 0.5);
+        }
+        x += 8;
+    }
+    Entity* entity = entity_create(ENT_BOSS);
+    entity->position = vec2_create(x, 20);
+    entity->size = vec2_create(5, 5);
 }
 
 void game_start(void)

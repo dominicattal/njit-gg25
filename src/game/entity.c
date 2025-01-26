@@ -228,6 +228,8 @@ void entity_get_tex_info(Entity* ent, u32* tex, f32* x1, f32* x2, f32* y1, f32* 
         CASE_GET_TEX_INFO(ENT_PUBBLES, pubbles_get_tex_info)
         CASE_GET_TEX_INFO(ENT_SHIRT, shirt_get_tex_info)
         CASE_GET_TEX_INFO(ENT_PROJECTILE, proj_get_tex_info)
+        CASE_GET_TEX_INFO(ENT_SOCKS, socks_get_tex_info)
+        CASE_GET_TEX_INFO(ENT_BOSS, boss_get_tex_info)
     }
 }
 
